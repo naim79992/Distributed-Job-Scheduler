@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Distributed Job Scheduler
 
 A powerful, high-availability distributed job scheduler built with Spring Boot and MySQL.
@@ -65,3 +66,6 @@ curl -X POST http://localhost:8081/api/jobs \
 - `GET /api/jobs`: List all jobs.
 - `GET /api/nodes`: List cluster nodes.
 - `GET /api/dashboard`: Get real-time stats.
+=======
+# Distributed-Job-Scheduler
+>>>>>>> 372b1ca3ae9c1410763c64bb26284000cff5ded3
