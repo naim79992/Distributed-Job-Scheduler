@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Distributed Job Scheduler Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #334155;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #334155;
+            font-size: 0.875rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background-color: #334155; color: #cbd5e1; }
+        .status-running { background-color: rgba(99, 102, 241, 0.2); color: #818cf8; }
+        .status-done { background-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .status-failed { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .status-alive { color: var(--accent-green); }
+        .status-dead { color: var(--accent-red); }
+
+        .leader-indicator {
+            background-color: var(--accent-orange);
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Distributed Job Scheduler</h1>
+            <div id="refresh-status" style="font-size: 0.8rem; color: var(--text-secondary)">
+                Auto-refreshing every 5s...
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Jobs</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Running</div>
+                <div class="stat-value" id="stat-running" style="color: var(--primary)">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completed</div>
+                <div class="stat-value" id="stat-completed" style="color: var(--accent-green)">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Alive Nodes</div>
+                <div class="stat-value" id="stat-nodes">0</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Worker Nodes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Node ID</th>
+                            <th>Host:Port</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="node-table-body">
+                        <!-- Nodes will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Create New Job</h2>
+                <form id="create-job-form">
+                    <div class="form-group">
+                        <input type="text" id="job-name" class="form-control" placeholder="Job Name (e.g., Email Task)" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="job-cron" class="form-control" placeholder="Cron (e.g., 0/10 * * * * *) - Optional for one-time" />
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="job-priority" class="form-control" placeholder="Priority (1-10)" required min="1" max="10" />
+                    </div>
+                    <button type="submit" class="btn">Add Job</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns: 1fr; margin-top: 2rem;">
+            <div class="card">
+                <h2>Recent Jobs</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Job Name</th>
+                            <th>Status</th>
+                            <th>Worker</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Next Run</th>
+                        </tr>
+                    </thead>
+                    <tbody id="job-table-body">
+                        <!-- Jobs will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function updateDashboard() {
+            try {
+                // Fetch stats
+                const statsResponse = await fetch('/api/dashboard');
+                const stats = await statsResponse.json();
+                document.getElementById('stat-total').innerText = stats.totalJobs;
+                document.getElementById('stat-running').innerText = stats.runningJobs;
+                document.getElementById('stat-completed').innerText = stats.completedJobs;
+                document.getElementById('stat-nodes').innerText = stats.aliveNodes;
+
+                // Fetch nodes
+                const nodesResponse = await fetch('/api/nodes');
+                const nodes = await nodesResponse.json();
+                const nodeBody = document.getElementById('node-table-body');
+                nodeBody.innerHTML = nodes.map(node => `
+                    <tr>
+                        <td>
+                            ${node.nodeId}
+                            ${node.leader ? '<span class="leader-indicator">LEADER</span>' : ''}
+                        </td>
+                        <td>${node.host}:${node.port}</td>
+                        <td class="${node.status === 'ALIVE' ? 'status-alive' : 'status-dead'}">
+                            ● ${node.status}
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Fetch jobs
+                const jobsResponse = await fetch('/api/jobs');
+                const jobs = await jobsResponse.json();
+                const jobBody = document.getElementById('job-table-body');
+                
+                const formatDate = (dateString) => {
+                    if (!dateString) return '-';
+                    const d = new Date(dateString);
+                    return d.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                };
+
+                // Remove .slice(-10) to show all jobs
+                jobBody.innerHTML = jobs.reverse().map(job => `
+                    <tr>
+                        <td>${job.name}</td>
+                        <td><span class="status-badge status-${job.status.toLowerCase()}">${job.status}</span></td>
+                        <td style="font-size: 0.75rem; color: var(--text-secondary)">${job.workerNodeId || '-'}</td>
+                        <td style="font-size: 0.75rem; color: var(--text-secondary)">${formatDate(job.lockedAt)}</td>
+                        <td style="font-size: 0.75rem; color: var(--text-secondary)">${formatDate(job.lastRunTime)}</td>
+                        <td style="font-size: 0.75rem; color: var(--text-secondary)">${formatDate(job.nextRunTime)}</td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Failed to update dashboard', error);
+            }
+        }
+
+        document.getElementById('create-job-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Adding...';
+
+            const jobData = {
+                name: document.getElementById('job-name').value,
+                cron: document.getElementById('job-cron').value,
+                priority: parseInt(document.getElementById('job-priority').value)
+            };
+
+            try {
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jobData)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('create-job-form').reset();
+                    updateDashboard(); // immediately show the new job
+                } else {
+                    alert('Failed to add job.');
+                }
+            } catch (err) {
+                console.error('Error adding job', err);
+            } finally {
+                btn.innerText = originalText;
+            }
+        });
+
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+    </script>
+</body>
+</html>
