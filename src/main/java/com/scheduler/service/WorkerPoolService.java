@@ -1,21 +1,24 @@
-package com.scheduler.core;
+package com.scheduler.service;
 
+import com.scheduler.entity.Job;
+import com.scheduler.entity.JobStatus;
+import com.scheduler.repository.JobRepository;
 import com.scheduler.distributed.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.springframework.scheduling.support.CronExpression;
 
-@Component
+@Service
 @Slf4j
 @RequiredArgsConstructor
-public class WorkerPool {
+public class WorkerPoolService {
 
     private final JobRepository jobRepo;
     private final DistributedLock distributedLock;

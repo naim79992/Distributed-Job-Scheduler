@@ -1,6 +1,6 @@
 package com.scheduler.distributed;
 
-import com.scheduler.core.WorkerNode;
+import com.scheduler.entity.WorkerNode;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.TreeMap;

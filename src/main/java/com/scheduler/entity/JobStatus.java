@@ -1,4 +1,4 @@
-package com.scheduler.core;
+package com.scheduler.entity;
 
 public enum JobStatus {
     PENDING,

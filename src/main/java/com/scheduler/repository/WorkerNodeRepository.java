@@ -1,5 +1,7 @@
-package com.scheduler.core;
+package com.scheduler.repository;
 
+import com.scheduler.entity.WorkerNode;
+import com.scheduler.entity.NodeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

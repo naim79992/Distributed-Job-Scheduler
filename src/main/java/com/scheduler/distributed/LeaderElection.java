@@ -1,8 +1,8 @@
 package com.scheduler.distributed;
 
-import com.scheduler.core.WorkerNode;
-import com.scheduler.core.WorkerNodeRepository;
-import com.scheduler.core.NodeStatus;
+import com.scheduler.entity.WorkerNode;
+import com.scheduler.entity.NodeStatus;
+import com.scheduler.repository.WorkerNodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

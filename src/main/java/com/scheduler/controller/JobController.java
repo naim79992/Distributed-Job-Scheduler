@@ -1,8 +1,8 @@
-package com.scheduler.api;
+package com.scheduler.controller;
 
-import com.scheduler.core.Job;
-import com.scheduler.core.JobRepository;
-import com.scheduler.core.JobStatus;
+import com.scheduler.entity.Job;
+import com.scheduler.entity.JobStatus;
+import com.scheduler.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

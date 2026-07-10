@@ -1,11 +1,11 @@
-package com.scheduler.features;
+package com.scheduler.service;
 
-import com.scheduler.core.WorkerNode;
-import com.scheduler.core.WorkerNodeRepository;
-import com.scheduler.core.NodeStatus;
-import com.scheduler.core.JobRepository;
-import com.scheduler.core.JobStatus;
-import com.scheduler.core.Job;
+import com.scheduler.entity.WorkerNode;
+import com.scheduler.entity.NodeStatus;
+import com.scheduler.entity.Job;
+import com.scheduler.entity.JobStatus;
+import com.scheduler.repository.WorkerNodeRepository;
+import com.scheduler.repository.JobRepository;
 import com.scheduler.distributed.LeaderElection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

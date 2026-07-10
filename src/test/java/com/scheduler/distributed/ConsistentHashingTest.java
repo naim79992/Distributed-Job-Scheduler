@@ -1,6 +1,6 @@
 package com.scheduler.distributed;
 
-import com.scheduler.core.WorkerNode;
+import com.scheduler.entity.WorkerNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

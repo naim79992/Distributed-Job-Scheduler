@@ -1,18 +1,24 @@
-package com.scheduler.core;
+package com.scheduler.service;
 
+import com.scheduler.entity.Job;
+import com.scheduler.entity.JobStatus;
+import com.scheduler.entity.NodeStatus;
+import com.scheduler.entity.WorkerNode;
+import com.scheduler.repository.JobRepository;
+import com.scheduler.repository.WorkerNodeRepository;
 import com.scheduler.distributed.ConsistentHashing;
 import com.scheduler.distributed.LeaderElection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
+@Service
 @Slf4j
 @RequiredArgsConstructor
-public class JobScheduler {
+public class JobSchedulerService {
 
     private final JobRepository jobRepo;
     private final WorkerNodeRepository nodeRepo;

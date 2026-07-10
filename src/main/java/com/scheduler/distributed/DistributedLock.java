@@ -1,7 +1,7 @@
 package com.scheduler.distributed;
 
-import com.scheduler.core.JobRepository;
-import com.scheduler.core.JobStatus;
+import com.scheduler.entity.JobStatus;
+import com.scheduler.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
