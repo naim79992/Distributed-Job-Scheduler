@@ -1,13 +1,14 @@
 package com.scheduler.controller;
 
 import com.scheduler.entity.Job;
-import com.scheduler.entity.JobStatus;
+import com.scheduler.enums.JobStatus;
 import com.scheduler.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/jobs")

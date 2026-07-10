@@ -1,7 +1,7 @@
 package com.scheduler.controller;
 
-import com.scheduler.entity.JobStatus;
-import com.scheduler.entity.NodeStatus;
+import com.scheduler.enums.JobStatus;
+import com.scheduler.enums.NodeStatus;
 import com.scheduler.repository.JobRepository;
 import com.scheduler.repository.WorkerNodeRepository;
 import lombok.RequiredArgsConstructor;

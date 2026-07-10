@@ -1,5 +1,6 @@
 package com.scheduler.entity;
 
+import com.scheduler.enums.JobStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.scheduler.distributed;
 
-import com.scheduler.entity.JobStatus;
+import com.scheduler.enums.JobStatus;
 import com.scheduler.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.scheduler.entity;
+package com.scheduler.enums;
 
 public enum NodeStatus {
     ALIVE,

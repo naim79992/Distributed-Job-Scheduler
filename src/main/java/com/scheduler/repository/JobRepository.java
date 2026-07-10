@@ -1,7 +1,7 @@
 package com.scheduler.repository;
 
 import com.scheduler.entity.Job;
-import com.scheduler.entity.JobStatus;
+import com.scheduler.enums.JobStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,8 +16,8 @@ public interface JobRepository extends JpaRepository<Job, String> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Job j SET j.lockedBy = :nodeId, j.lockedAt = :now, j.status = com.scheduler.entity.JobStatus.RUNNING " +
-           "WHERE j.id = :jobId AND j.lockedBy IS NULL AND j.status = com.scheduler.entity.JobStatus.PENDING")
+    @Query("UPDATE Job j SET j.lockedBy = :nodeId, j.lockedAt = :now, j.status = com.scheduler.enums.JobStatus.RUNNING " +
+           "WHERE j.id = :jobId AND j.lockedBy IS NULL AND j.status = com.scheduler.enums.JobStatus.PENDING")
     int tryLockJob(@Param("jobId") String jobId, @Param("nodeId") String nodeId, @Param("now") LocalDateTime now);
     
     @Modifying

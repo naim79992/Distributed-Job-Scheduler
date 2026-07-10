@@ -1,7 +1,7 @@
 package com.scheduler.service;
 
 import com.scheduler.entity.WorkerNode;
-import com.scheduler.entity.NodeStatus;
+import com.scheduler.enums.NodeStatus;
 import com.scheduler.repository.WorkerNodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

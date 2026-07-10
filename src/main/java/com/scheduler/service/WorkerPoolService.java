@@ -1,7 +1,7 @@
 package com.scheduler.service;
 
 import com.scheduler.entity.Job;
-import com.scheduler.entity.JobStatus;
+import com.scheduler.enums.JobStatus;
 import com.scheduler.repository.JobRepository;
 import com.scheduler.distributed.DistributedLock;
 import lombok.RequiredArgsConstructor;
