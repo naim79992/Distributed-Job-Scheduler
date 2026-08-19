@@ -114,10 +114,8 @@ Instead of standard modulo routing, a virtual `TreeMap` ring is constructed:
 | **HTTP Client** | RxJS + HttpClient | Reactive API communication from Angular to Java |
 | **Dev Proxy** | Angular CLI Proxy | Routes `/api` calls to specific backend node ports |
 | **Testing** | JUnit 5 + Mockito + H2 | Industry-standard unit, slice, and integration tests |
-<<<<<<< Updated upstream
-=======
 | **API Docs** | OpenAPI 3 (Swagger) | Auto-generated interactive API documentation |
->>>>>>> Stashed changes
+| **Deployment** | Docker & Docker Compose | Containerization and full-stack orchestration |
 | **Build Tool** | Maven | Java dependency and build management |
 | **Package Manager** | NPM | Frontend dependency management |
 
@@ -129,12 +127,16 @@ The project follows a standard **Package-by-Layer** pattern for clear separation
 
 ```text
 Distributed-Job-Scheduler/
+├── docker-compose.yml                  # Docker Compose multi-container orchestration
+├── Dockerfile                          # Multi-stage Dockerfile for Java Backend
 ├── frontend/                           # Angular Dashboard Application
+│   ├── Dockerfile                      # Multi-stage Dockerfile for Angular Frontend
+│   ├── nginx.conf                      # Nginx configuration for Docker proxy
 │   ├── src/app/
 │   │   ├── components/                 # UI components (dashboard layout)
 │   │   ├── models/                     # TypeScript interfaces
 │   │   └── services/                   # HTTP services connecting to Java API
-│   ├── proxy-8080.conf.json            # Proxy config for port 8080
+│   ├── proxy-8080.conf.json            # Proxy config for port 8080 (local dev)
 │   └── package.json                    # NPM dependencies and custom start scripts
 │
 ├── src/main/java/com/scheduler/        # Java Spring Boot Backend
