@@ -203,8 +203,24 @@ The project includes a comprehensive test suite (Unit Tests, `@WebMvcTest` contr
 mvn test
 ```
 
-### Running a Local Multi-Node Cluster
-You can run multiple instances of the backend application on a single machine by passing dynamic port and node ID values.
+### Running with Docker Compose (Recommended)
+The easiest way to run the entire stack (MySQL, Spring Boot Backend, Angular Frontend) is using Docker Compose.
+
+1. Ensure Docker and Docker Compose are installed.
+2. From the root directory, run:
+   ```bash
+   docker-compose up -d --build
+   ```
+3. Once all containers are running:
+   - **Angular Dashboard:** [http://localhost:4200](http://localhost:4200)
+   - **Backend API & Swagger:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+4. To stop the cluster:
+   ```bash
+   docker-compose down
+   ```
+
+### Running a Local Multi-Node Cluster (Manual)
+You can run multiple instances of the backend application on a single machine manually by passing dynamic port and node ID values.
 
 #### 1. Start the Java Backend (Windows PowerShell)
 ```powershell
