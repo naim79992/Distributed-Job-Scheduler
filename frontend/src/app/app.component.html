@@ -1,0 +1,150 @@
+<div class="container">
+  <header>
+    <h1>Distributed Job Scheduler (Angular)</h1>
+    <div style="font-size: 0.8rem; color: var(--text-secondary)">
+      Auto-refreshing every 5s...
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Jobs</div>
+      <div class="stat-value">{{ stats.totalJobs }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Running</div>
+      <div class="stat-value" style="color: var(--primary)">{{ stats.runningJobs }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value" style="color: var(--accent-green)">{{ stats.completedJobs }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Alive Nodes</div>
+      <div class="stat-value">{{ stats.aliveNodes }}</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Worker Nodes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Node ID</th>
+            <th>Host:Port</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let node of nodes">
+            <td>
+              {{ node.nodeId }}
+              <span *ngIf="node.leader" class="leader-indicator">LEADER</span>
+            </td>
+            <td>{{ node.host }}:{{ node.port }}</td>
+            <td [ngClass]="node.status === 'ALIVE' ? 'status-alive' : 'status-dead'">
+              ● {{ node.status }}
+            </td>
+          </tr>
+          <tr *ngIf="nodes.length === 0">
+            <td colspan="3" style="text-align: center; color: var(--text-secondary)">No worker nodes active.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Create New Job</h2>
+      <form (submit)="addJob()">
+        <div class="form-group">
+          <input
+            type="text"
+            [(ngModel)]="newJobName"
+            name="jobName"
+            class="form-control"
+            placeholder="Job Name (e.g., Database Backup)"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="text"
+            [(ngModel)]="newJobCron"
+            name="jobCron"
+            class="form-control"
+            placeholder="Cron Expression (e.g., 0/10 * * * * *) - Optional"
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="number"
+            [(ngModel)]="newJobPriority"
+            name="jobPriority"
+            class="form-control"
+            placeholder="Priority (1-10)"
+            required
+            min="1"
+            max="10"
+          />
+        </div>
+        <button type="submit" class="btn" [disabled]="isAdding">
+          {{ isAdding ? 'Adding...' : 'Add Job' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 1fr; margin-top: 2rem;">
+    <div class="card">
+      <h2>Recent Jobs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Job Name</th>
+            <th>Status</th>
+            <th>Worker</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Next Run</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let job of jobs">
+            <td>{{ job.name }}</td>
+            <td>
+              <span [class]="'status-badge status-' + job.status.toLowerCase()">
+                {{ job.status }}
+              </span>
+            </td>
+            <td style="font-size: 0.75rem; color: var(--text-secondary)">
+              {{ job.workerNodeId || '-' }}
+            </td>
+            <td style="font-size: 0.75rem; color: var(--text-secondary)">
+              {{ formatDate(job.lockedAt) }}
+            </td>
+            <td style="font-size: 0.75rem; color: var(--text-secondary)">
+              {{ formatDate(job.lastRunTime) }}
+            </td>
+            <td style="font-size: 0.75rem; color: var(--text-secondary)">
+              {{ formatDate(job.nextRunTime) }}
+            </td>
+            <td>
+              <button
+                class="btn"
+                style="background-color: var(--accent-red); padding: 0.25rem 0.5rem; font-size: 0.75rem; width: auto;"
+                (click)="deleteJob(job.id)"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="jobs.length === 0">
+            <td colspan="7" style="text-align: center; color: var(--text-secondary)">No jobs submitted yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

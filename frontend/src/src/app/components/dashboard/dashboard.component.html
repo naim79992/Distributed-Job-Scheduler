@@ -1,0 +1,204 @@
+<div class="container">
+  <header>
+    <div>
+      <h1>Distributed Job Scheduler</h1>
+      <p class="subtitle">Real-time Cluster & Job Monitoring Dashboard</p>
+    </div>
+    <div class="header-actions">
+      <button (click)="refreshNow()" class="btn-refresh" [title]="'Last updated: ' + (lastUpdated ? (lastUpdated | date:'mediumTime') : 'Never')">
+        <span class="refresh-icon">↻</span> Refresh
+      </button>
+      <div id="refresh-status" class="auto-refresh-badge">
+        <span class="pulse-dot"></span> Auto-refreshing (5s)
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total-icon">📋</div>
+      <div class="stat-info">
+        <div class="stat-label">Total Jobs</div>
+        <div class="stat-value" id="stat-total">{{ stats.totalJobs }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon running-icon">⚡</div>
+      <div class="stat-info">
+        <div class="stat-label">Running</div>
+        <div class="stat-value text-primary" id="stat-running">{{ stats.runningJobs }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon completed-icon">✅</div>
+      <div class="stat-info">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value text-success" id="stat-completed">{{ stats.completedJobs }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon nodes-icon">🖥️</div>
+      <div class="stat-info">
+        <div class="stat-label">Alive Nodes</div>
+        <div class="stat-value text-nodes" id="stat-nodes">{{ stats.aliveNodes }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Worker Nodes Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Worker Nodes</h2>
+        <span class="node-count-badge">{{ nodes.length }} Active</span>
+      </div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Node ID</th>
+              <th>Host:Port</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="node-table-body">
+            @for (node of nodes; track node.nodeId) {
+              <tr>
+                <td class="node-id-cell">
+                  <span class="node-id-text">{{ node.nodeId }}</span>
+                  @if (node.leader) {
+                    <span class="leader-indicator">LEADER</span>
+                  }
+                </td>
+                <td class="host-cell">{{ node.host }}:{{ node.port }}</td>
+                <td [ngClass]="node.status === 'ALIVE' ? 'status-alive' : 'status-dead'">
+                  <span class="status-dot">●</span> {{ node.status }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="empty-state">
+                  @if (isLoading) { Loading worker nodes... } @else { No worker nodes registered }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Create New Job Form Card -->
+    <div class="card">
+      <h2>Create New Job</h2>
+      
+      @if (submitSuccess) {
+        <div class="alert alert-success">{{ submitSuccess }}</div>
+      }
+      @if (submitError) {
+        <div class="alert alert-danger">{{ submitError }}</div>
+      }
+
+      <form [formGroup]="jobForm" (ngSubmit)="onSubmit()" id="create-job-form">
+        <div class="form-group">
+          <label for="job-name">Job Name</label>
+          <input 
+            type="text" 
+            id="job-name" 
+            formControlName="name"
+            class="form-control" 
+            placeholder="Job Name (e.g., Email Task)" 
+            [class.is-invalid]="jobForm.get('name')?.invalid && jobForm.get('name')?.touched"
+          />
+          @if (jobForm.get('name')?.invalid && jobForm.get('name')?.touched) {
+            <small class="error-text">Job Name is required (at least 2 chars)</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="job-cron">Cron Expression (Optional)</label>
+          <input 
+            type="text" 
+            id="job-cron" 
+            formControlName="cron"
+            class="form-control" 
+            placeholder="Cron (e.g., 0/10 * * * * *) - Optional for one-time" 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="job-priority">Priority (1-10)</label>
+          <input 
+            type="number" 
+            id="job-priority" 
+            formControlName="priority"
+            class="form-control" 
+            placeholder="Priority (1-10)" 
+            min="1" 
+            max="10" 
+            [class.is-invalid]="jobForm.get('priority')?.invalid && jobForm.get('priority')?.touched"
+          />
+          @if (jobForm.get('priority')?.invalid && jobForm.get('priority')?.touched) {
+            <small class="error-text">Priority must be between 1 and 10</small>
+          }
+        </div>
+
+        <button type="submit" class="btn" [disabled]="jobForm.invalid || isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner"></span> Adding...
+          } @else {
+            Add Job
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Recent Jobs Section -->
+  <div class="grid full-width-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2>Recent Jobs</h2>
+        <span class="jobs-count">{{ jobs.length }} Total</span>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Job Name</th>
+              <th>Status</th>
+              <th>Worker</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Next Run</th>
+            </tr>
+          </thead>
+          <tbody id="job-table-body">
+            @for (job of jobs; track job.id || job.name) {
+              <tr>
+                <td class="job-name-cell">{{ job.name }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(job.status)">
+                    {{ job.status }}
+                  </span>
+                </td>
+                <td class="subtext-cell">{{ job.workerNodeId || '-' }}</td>
+                <td class="subtext-cell">{{ formatDate(job.lockedAt) }}</td>
+                <td class="subtext-cell">{{ formatDate(job.lastRunTime) }}</td>
+                <td class="subtext-cell">{{ formatDate(job.nextRunTime) }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-state">
+                  @if (isLoading) { Loading jobs... } @else { No jobs created yet }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

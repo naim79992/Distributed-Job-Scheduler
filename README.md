@@ -107,34 +107,42 @@ Instead of standard modulo routing, a virtual `TreeMap` ring is constructed:
 The project follows a standard **Package-by-Layer** pattern for clear separation of concerns, readability, and ease of maintainability:
 
 ```text
-src/main/java/com/scheduler/
+Distributed-Job-Scheduler/
+├── frontend/                           # Angular Dashboard Application
+│   ├── src/app/
+│   │   ├── components/                 # UI components (dashboard layout)
+│   │   ├── models/                     # TypeScript interfaces
+│   │   └── services/                   # HTTP services connecting to Java API
+│   ├── proxy-8080.conf.json            # Proxy config for port 8080
+│   └── package.json                    # NPM dependencies and custom start scripts
 │
-├── controller/
-│   ├── JobController.java          # REST API endpoints for submitting/managing jobs
-│   └── DashboardController.java    # MVC controller serving UI and dashboard stats
-│
-├── entity/
-│   ├── Job.java                    # JPA Entity representing a scheduler task
-│   ├── JobStatus.java              # Enum: PENDING, RUNNING, DONE, FAILED, DEAD
-│   ├── WorkerNode.java             # JPA Entity representing a node in the cluster
-│   └── NodeStatus.java             # Enum: ALIVE, DEAD
-│
-├── repository/
-│   ├── JobRepository.java          # Database queries for Job manipulation
-│   └── WorkerNodeRepository.java   # Leader/node status queries & leadership locks
-│
-├── service/
-│   ├── JobSchedulerService.java    # (Leader-only) Consistent hash job allocator
-│   ├── WorkerPoolService.java      # Handles local job queueing and thread pool execution
-│   ├── HeartbeatService.java       # Periodically broadcasts node heartbeat state
-│   └── FailoverService.java        # (Leader-only) Detects dead nodes & reclaims tasks
-│
-├── distributed/
-│   ├── ConsistentHashing.java      # Node ring allocator algorithm
-│   ├── DistributedLock.java        # DB-backed execution locking mechanics
-│   └── LeaderElection.java         # Consensus and leadership management
-│
-└── DistributedJobSchedulerApplication.java # Spring Boot main startup class
+├── src/main/java/com/scheduler/        # Java Spring Boot Backend
+│   ├── controller/
+│   │   ├── JobController.java          # REST API endpoints for submitting/managing jobs
+│   │   └── DashboardController.java    # REST API for dashboard stats and nodes
+│   │
+│   ├── entity/
+│   │   ├── Job.java                    # JPA Entity representing a scheduler task
+│   │   ├── JobStatus.java              # Enum: PENDING, RUNNING, DONE, FAILED, DEAD
+│   │   ├── WorkerNode.java             # JPA Entity representing a node in the cluster
+│   │   └── NodeStatus.java             # Enum: ALIVE, DEAD
+│   │
+│   ├── repository/
+│   │   ├── JobRepository.java          # Database queries for Job manipulation
+│   │   └── WorkerNodeRepository.java   # Leader/node status queries & leadership locks
+│   │
+│   ├── service/
+│   │   ├── JobSchedulerService.java    # (Leader-only) Consistent hash job allocator
+│   │   ├── WorkerPoolService.java      # Handles local job queueing and thread pool execution
+│   │   ├── HeartbeatService.java       # Periodically broadcasts node heartbeat state
+│   │   └── FailoverService.java        # (Leader-only) Detects dead nodes & reclaims tasks
+│   │
+│   ├── distributed/
+│   │   ├── ConsistentHashing.java      # Node ring allocator algorithm
+│   │   ├── DistributedLock.java        # DB-backed execution locking mechanics
+│   │   └── LeaderElection.java         # Consensus and leadership management
+│   │
+│   └── DistributedJobSchedulerApplication.java # Spring Boot main startup class
 ```
 
 ---
@@ -160,30 +168,35 @@ mvn clean package -DskipTests
 ```
 
 ### Running a Local Multi-Node Cluster
-You can run multiple instances of the application on a single machine by passing dynamic port and node ID values.
+You can run multiple instances of the backend application on a single machine by passing dynamic port and node ID values.
 
-#### Unix / Linux / macOS (Bash/Zsh)
-```bash
-# Terminal 1: Node 1 (Leader Candidate)
-PORT=8081 NODE_ID=node-8081 java -jar target/distributed-job-scheduler-0.0.1-SNAPSHOT.jar
-
-# Terminal 2: Node 2
-PORT=8082 NODE_ID=node-8082 java -jar target/distributed-job-scheduler-0.0.1-SNAPSHOT.jar
-
-# Terminal 3: Node 3
-PORT=8083 NODE_ID=node-8083 java -jar target/distributed-job-scheduler-0.0.1-SNAPSHOT.jar
-```
-
-#### Windows (PowerShell)
+#### 1. Start the Java Backend (Windows PowerShell)
 ```powershell
-# Terminal 1
+# Terminal 1: Backend Node 1 (8080)
+$env:PORT="8080"; $env:NODE_ID="node-8080"; mvn spring-boot:run
+
+# Terminal 2: Backend Node 2 (8081)
 $env:PORT="8081"; $env:NODE_ID="node-8081"; mvn spring-boot:run
 
-# Terminal 2
+# Terminal 3: Backend Node 3 (8082)
 $env:PORT="8082"; $env:NODE_ID="node-8082"; mvn spring-boot:run
+```
 
-# Terminal 3
-$env:PORT="8083"; $env:NODE_ID="node-8083"; mvn spring-boot:run
+#### 2. Start the Angular Frontend
+The UI is a separate Angular application. We have configured scripts to proxy API calls to different backend nodes dynamically. 
+
+Open a new terminal and navigate to the `frontend` directory:
+```powershell
+cd frontend
+npm install
+```
+
+Now, start the Angular dashboard for your preferred backend node:
+```powershell
+npm start          # Runs on http://localhost:4200 (Connects to Java 8080)
+npm run start:8081 # Runs on http://localhost:4201 (Connects to Java 8081)
+npm run start:8082 # Runs on http://localhost:4202 (Connects to Java 8082)
+npm run start:8083 # Runs on http://localhost:4203 (Connects to Java 8083)
 ```
 
 ---
@@ -217,10 +230,11 @@ $env:PORT="8083"; $env:NODE_ID="node-8083"; mvn spring-boot:run
 
 ## Dashboard UI
 
-Access the real-time cluster monitor by opening any running node's base address in your web browser:
-* **URL:** [http://localhost:8081/dashboard](http://localhost:8081/dashboard)
+Access the real-time cluster monitor by opening the Angular application in your web browser. Depending on which Angular script you ran, the URL will be:
+* **URL:** [http://localhost:4200](http://localhost:4200) (For 8080)
+* **URL:** [http://localhost:4201](http://localhost:4201) (For 8081)
 
-The interface automatically polls health data every 5 seconds to visualize:
+The Angular interface automatically polls health data every 5 seconds to visualize:
 - Connected worker nodes and their leadership indicators.
 - Live system-wide metrics (Total Jobs, Running tasks, Completed queue, Active nodes).
 - Job history table mapping active workloads to processing nodes.
