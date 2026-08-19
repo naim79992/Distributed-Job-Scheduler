@@ -113,6 +113,7 @@ Instead of standard modulo routing, a virtual `TreeMap` ring is constructed:
 | **Frontend** | Angular 19 | Standalone SPA dashboard for real-time monitoring |
 | **HTTP Client** | RxJS + HttpClient | Reactive API communication from Angular to Java |
 | **Dev Proxy** | Angular CLI Proxy | Routes `/api` calls to specific backend node ports |
+| **Testing** | JUnit 5 + Mockito + H2 | Industry-standard unit, slice, and integration tests |
 | **Build Tool** | Maven | Java dependency and build management |
 | **Package Manager** | NPM | Frontend dependency management |
 
@@ -159,6 +160,12 @@ Distributed-Job-Scheduler/
 │   │   └── LeaderElection.java         # Consensus and leadership management
 │   │
 │   └── DistributedJobSchedulerApplication.java # Spring Boot main startup class
+│
+├── src/test/java/com/scheduler/        # Unit and Integration Tests
+│   ├── controller/                     # @WebMvcTest controller slice tests
+│   ├── distributed/                    # Logic and mockito tests for core algorithms
+│   ├── repository/                     # @DataJpaTest integration tests with H2
+│   └── service/                        # Mockito-based service layer unit tests
 ```
 
 ---
@@ -182,6 +189,12 @@ Distributed-Job-Scheduler/
 Compile and package the JAR file:
 ```bash
 mvn clean package -DskipTests
+```
+
+### Running Tests
+The project includes a comprehensive test suite (Unit Tests, `@WebMvcTest` controller slices, and `@DataJpaTest` repository integration tests using an in-memory **H2** database). To run the tests:
+```bash
+mvn test
 ```
 
 ### Running a Local Multi-Node Cluster
