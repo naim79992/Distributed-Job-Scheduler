@@ -114,6 +114,10 @@ Instead of standard modulo routing, a virtual `TreeMap` ring is constructed:
 | **HTTP Client** | RxJS + HttpClient | Reactive API communication from Angular to Java |
 | **Dev Proxy** | Angular CLI Proxy | Routes `/api` calls to specific backend node ports |
 | **Testing** | JUnit 5 + Mockito + H2 | Industry-standard unit, slice, and integration tests |
+<<<<<<< Updated upstream
+=======
+| **API Docs** | OpenAPI 3 (Swagger) | Auto-generated interactive API documentation |
+>>>>>>> Stashed changes
 | **Build Tool** | Maven | Java dependency and build management |
 | **Package Manager** | NPM | Frontend dependency management |
 
@@ -134,6 +138,8 @@ Distributed-Job-Scheduler/
 │   └── package.json                    # NPM dependencies and custom start scripts
 │
 ├── src/main/java/com/scheduler/        # Java Spring Boot Backend
+│   ├── config/
+│   │   └── SwaggerConfig.java          # OpenAPI 3.0 / Swagger configuration
 │   ├── controller/
 │   │   ├── JobController.java          # REST API endpoints for submitting/managing jobs
 │   │   └── DashboardController.java    # REST API for dashboard stats and nodes
@@ -232,6 +238,13 @@ npm run start:8083 # Runs on http://localhost:4203 (Connects to Java 8083)
 ---
 
 ## API Reference
+
+### 📚 Interactive API Documentation (Swagger UI)
+The project integrates **Springdoc OpenAPI 3 (Swagger)** for professional and interactive API documentation. 
+
+Once the Java backend is running, you can access the Swagger UI and OpenAPI specifications at:
+- **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) (replace `8080` with your active node port)
+- **OpenAPI JSON Spec:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
 ### 1. Submit a Job
 * **Endpoint:** `POST /api/jobs`
