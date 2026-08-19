@@ -16,8 +16,8 @@ public interface JobRepository extends JpaRepository<Job, String> {
     
     @Modifying
     @Transactional
-    @Query("UPDATE Job j SET j.lockedBy = :nodeId, j.lockedAt = :now, j.status = com.scheduler.enums.JobStatus.RUNNING " +
-           "WHERE j.id = :jobId AND j.lockedBy IS NULL AND j.status = com.scheduler.enums.JobStatus.PENDING")
+    @Query("UPDATE Job j SET j.lockedBy = :nodeId, j.lockedAt = :now, j.status = 'RUNNING' " +
+           "WHERE j.id = :jobId AND j.lockedBy IS NULL AND j.status = 'PENDING'")
     int tryLockJob(@Param("jobId") String jobId, @Param("nodeId") String nodeId, @Param("now") LocalDateTime now);
     
     @Modifying
