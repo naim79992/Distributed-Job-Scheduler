@@ -1,6 +1,6 @@
 # Distributed Job Scheduler
 
-A highly available, fault-tolerant distributed job scheduler built with Java 17, Spring Boot, and MySQL. It is designed to coordinate, allocate, and execute computational tasks across a cluster of nodes using database-backed distributed algorithms including Leader Election, Distributed Locking, and Consistent Hashing.
+A highly available, fault-tolerant distributed job scheduler built with **Java 17**, **Spring Boot**, and **MySQL**. It coordinates, allocates, and executes computational tasks across a cluster of worker nodes using database-backed distributed algorithms — including Leader Election, Distributed Locking, and Consistent Hashing. A standalone **Angular 19** dashboard provides real-time monitoring of jobs and nodes.
 
 ---
 
@@ -168,6 +168,7 @@ Distributed-Job-Scheduler/
 ### Prerequisites
 * Java Development Kit (JDK) 17 or higher
 * Apache Maven 3.8+
+* Node.js 18+ and NPM (for the Angular frontend)
 * Running MySQL instance
 
 ### Database Setup
@@ -226,34 +227,44 @@ npm run start:8083 # Runs on http://localhost:4203 (Connects to Java 8083)
   ```json
   {
     "name": "Database Backup Job",
-    "cronExpression": "0 */5 * * * *",
+    "cron": "0 */5 * * * *",
     "priority": 1
   }
   ```
+  > `cron` is optional. If omitted, the job runs immediately as a one-time task.
 
 ### 2. Retrieve All Jobs
 * **Endpoint:** `GET /api/jobs`
-* **Description:** Lists all registered jobs with details (status, worker assigned, last run, etc.).
+* **Description:** Lists all registered jobs with details (status, worker assigned, last run, next run, etc.).
 
-### 3. List Active Nodes
+### 3. Get Dashboard Stats
+* **Endpoint:** `GET /api/dashboard`
+* **Description:** Returns aggregate stats — total, running, completed, failed jobs and alive/dead node counts.
+
+### 4. List Active Nodes
 * **Endpoint:** `GET /api/nodes`
-* **Description:** Returns JSON representation of all registered cluster nodes and leadership statuses.
+* **Description:** Returns JSON representation of all registered cluster nodes and their leadership status.
 
-### 4. Delete/Cancel Job
+### 5. Delete/Cancel Job
 * **Endpoint:** `DELETE /api/jobs/{id}`
 
 ---
 
 ## Dashboard UI
 
-Access the real-time cluster monitor by opening the Angular application in your web browser. Depending on which Angular script you ran, the URL will be:
-* **URL:** [http://localhost:4200](http://localhost:4200) (For 8080)
-* **URL:** [http://localhost:4201](http://localhost:4201) (For 8081)
+Access the real-time cluster monitor by opening the Angular dashboard in your browser. Each Angular instance connects to its corresponding Java backend node:
 
-The Angular interface automatically polls health data every 5 seconds to visualize:
-- Connected worker nodes and their leadership indicators.
-- Live system-wide metrics (Total Jobs, Running tasks, Completed queue, Active nodes).
-- Job history table mapping active workloads to processing nodes.
+| Angular URL | Connected Backend |
+|---|---|
+| [http://localhost:4200](http://localhost:4200) | Java node on port 8080 |
+| [http://localhost:4201](http://localhost:4201) | Java node on port 8081 |
+| [http://localhost:4202](http://localhost:4202) | Java node on port 8082 |
+| [http://localhost:4203](http://localhost:4203) | Java node on port 8083 |
+
+The dashboard automatically polls every 5 seconds to display:
+- Connected worker nodes with their **LEADER / FOLLOWER** status.
+- Live system-wide metrics: Total Jobs, Running, Completed, and Active Nodes.
+- Full job history table with worker assignment, start time, end time, and next scheduled run.
 
 ---
 
