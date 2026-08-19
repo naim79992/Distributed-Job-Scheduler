@@ -106,12 +106,15 @@ Instead of standard modulo routing, a virtual `TreeMap` ring is constructed:
 
 | Layer | Technology | Description |
 |---|---|---|
-| **Runtime** | Java 17 | Core programming platform |
-| **Framework** | Spring Boot 3.2.3 | Dependency injection, scheduling, and MVC |
-| **Data Access**| Spring Data JPA | ORM wrapper for SQL communication |
+| **Runtime** | Java 17 | Core backend programming platform |
+| **Framework** | Spring Boot 3.2.3 | Dependency injection, scheduling, and REST API |
+| **Data Access** | Spring Data JPA | ORM wrapper for SQL communication |
 | **Database** | MySQL | Persistent store for job state and cluster registry |
-| **Template** | Thymeleaf | Server-side template rendering for UI |
-| **Build Tool**| Maven | Dependency and build management |
+| **Frontend** | Angular 19 | Standalone SPA dashboard for real-time monitoring |
+| **HTTP Client** | RxJS + HttpClient | Reactive API communication from Angular to Java |
+| **Dev Proxy** | Angular CLI Proxy | Routes `/api` calls to specific backend node ports |
+| **Build Tool** | Maven | Java dependency and build management |
+| **Package Manager** | NPM | Frontend dependency management |
 
 ---
 
