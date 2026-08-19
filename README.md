@@ -242,6 +242,8 @@ npm run start:8083 # Runs on http://localhost:4203 (Connects to Java 8083)
 ### 📚 Interactive API Documentation (Swagger UI)
 The project integrates **Springdoc OpenAPI 3 (Swagger)** for professional and interactive API documentation. 
 
+> **Note:** If you recently pulled these changes and get a `404 Not Found` error when accessing the Swagger URL, make sure to stop your server and run `mvn clean install` to download the new Springdoc dependencies before restarting.
+
 Once the Java backend is running, you can access the Swagger UI and OpenAPI specifications at:
 - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) (replace `8080` with your active node port)
 - **OpenAPI JSON Spec:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
