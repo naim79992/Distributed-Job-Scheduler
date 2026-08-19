@@ -6,19 +6,32 @@ A highly available, fault-tolerant distributed job scheduler built with Java 17,
 
 ## Table of Contents
 
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Distributed Algorithms](#distributed-algorithms)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Database Setup](#database-setup)
-  - [Building the Application](#building-the-application)
-  - [Running a Local Multi-Node Cluster](#running-a-local-multi-node-cluster)
-- [API Reference](#api-reference)
-- [Dashboard UI](#dashboard-ui)
-- [License](#license)
+- [Distributed Job Scheduler](#distributed-job-scheduler)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+    - [Core Scheduling \& Execution](#core-scheduling--execution)
+    - [Distributed Coordination](#distributed-coordination)
+  - [System Architecture](#system-architecture)
+  - [Distributed Algorithms](#distributed-algorithms)
+    - [1. Leader Election](#1-leader-election)
+    - [2. Distributed Locking](#2-distributed-locking)
+    - [3. Consistent Hashing](#3-consistent-hashing)
+  - [Tech Stack](#tech-stack)
+  - [Project Structure](#project-structure)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Database Setup](#database-setup)
+    - [Building the Application](#building-the-application)
+    - [Running a Local Multi-Node Cluster](#running-a-local-multi-node-cluster)
+      - [1. Start the Java Backend (Windows PowerShell)](#1-start-the-java-backend-windows-powershell)
+      - [2. Start the Angular Frontend](#2-start-the-angular-frontend)
+  - [API Reference](#api-reference)
+    - [1. Submit a Job](#1-submit-a-job)
+    - [2. Retrieve All Jobs](#2-retrieve-all-jobs)
+    - [3. List Active Nodes](#3-list-active-nodes)
+    - [4. Delete/Cancel Job](#4-deletecancel-job)
+  - [Dashboard UI](#dashboard-ui)
+  - [License](#license)
 
 ---
 
@@ -93,12 +106,15 @@ Instead of standard modulo routing, a virtual `TreeMap` ring is constructed:
 
 | Layer | Technology | Description |
 |---|---|---|
-| **Runtime** | Java 17 | Core programming platform |
-| **Framework** | Spring Boot 3.2.3 | Dependency injection, scheduling, and MVC |
-| **Data Access**| Spring Data JPA | ORM wrapper for SQL communication |
+| **Runtime** | Java 17 | Core backend programming platform |
+| **Framework** | Spring Boot 3.2.3 | Dependency injection, scheduling, and REST API |
+| **Data Access** | Spring Data JPA | ORM wrapper for SQL communication |
 | **Database** | MySQL | Persistent store for job state and cluster registry |
-| **Template** | Thymeleaf | Server-side template rendering for UI |
-| **Build Tool**| Maven | Dependency and build management |
+| **Frontend** | Angular 19 | Standalone SPA dashboard for real-time monitoring |
+| **HTTP Client** | RxJS + HttpClient | Reactive API communication from Angular to Java |
+| **Dev Proxy** | Angular CLI Proxy | Routes `/api` calls to specific backend node ports |
+| **Build Tool** | Maven | Java dependency and build management |
+| **Package Manager** | NPM | Frontend dependency management |
 
 ---
 
